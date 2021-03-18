@@ -1,0 +1,1 @@
+<Response>{% for sMessage in aReturn %}<Message>{{sMessage}}</Message>{% endfor %}</Response>
