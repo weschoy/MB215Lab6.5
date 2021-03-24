@@ -24,14 +24,14 @@ class Order(models.Model):
             self.data["toppings"]=sInput.lower()
             aReturn.append("Would you like drinks with that?")
             aReturn.append("Please enter a list with commas or NO")
+            aReturn.append("+$2 per each drink")
             self.data["state"]="DRINKS"
         elif sState=="DRINKS":
             if sInput.lower() !="no":
                 self.data["drinks"]=sInput.lower()
-                aReturn.append("+$2 per each drink")
-            nDrinks=self.data["drinks"].split(",")
-            for x in nDrinks:
-                self.nPrice+=2
+                nDrinks=self.data["drinks"].split(",")
+                for x in nDrinks:
+                    self.nPrice+=2
             nToppings=self.data["toppings"].split(",")
             for x in nToppings:
                 self.nPrice+=2
@@ -59,3 +59,17 @@ class Order(models.Model):
             return True
         else:
             return False
+    def getState(self):
+        return self.data["state"]
+    def getSize(self):
+        return self.data["size"]
+    def getToppings(self):
+        return self.data["toppings"]
+    def getDrinks(self):
+        try:
+            return self.data["drinks"]    
+        except:
+            return None
+    class Meta:
+        # this sets up a SQL index on the phone field
+        indexes = [models.Index(fields=['phone'])]
