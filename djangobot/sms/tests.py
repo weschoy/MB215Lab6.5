@@ -48,7 +48,17 @@ class SMSTests(TestCase):
         self.assertEqual(aReturn[0], "Oops we only have small and large", "size message line 1")
         self.assertEqual(aReturn[1], "Please enter small or large", "size message line 2")
         self.assertEqual(oOrder.getState(), "SIZE", "order state should be SIZE")
-    
+    def test_toppings(self):
+        oOrder = Order(phone = '123-456-7890', data={"state":"SIZE"})
+        aReturn = oOrder.handleInput("small")
+        aReturn = oOrder.handleInput("blueberry, apple, lemon")
+        self.assertEqual(aReturn[0], "So far your order comes to $11", "price of pie with topping")
+        self.assertEqual(aReturn[1], "Would you like drinks with that?", "toppings message line 1")
+        self.assertEqual(aReturn[2], "Please enter a list with commas or NO", "toppings message line 2")
+        self.assertEqual(aReturn[3], "+$2 per each drink", "price for toppings")
+        self.assertEqual(oOrder.getState(), "DRINKS", "order state should be DRINKS")
+        self.assertEqual(oOrder.getToppings(), "blueberry, apple, lemon", "toppings should be as entered")
+        self.assertEqual(oOrder.getPrice(), 11, "price should be $11")
     def test_no_drinks(self):
         oOrder = Order(phone = '123-456-7890', data={"state":"SIZE"})
         aReturn = oOrder.handleInput("small")
@@ -72,3 +82,4 @@ class SMSTests(TestCase):
         self.assertEqual(aReturn[4], "The price is $13", "price for the order")
         self.assertEqual(oOrder.getState(), "DONE", "order state should be DONE")
         self.assertEqual(oOrder.getDrinks(), "dr.pepper", "one drinks were entered")
+    
