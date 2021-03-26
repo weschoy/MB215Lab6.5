@@ -8,20 +8,33 @@ class Order(models.Model):
     def handleInput(self, sInput):
         aReturn = []
         sState=self.data["state"]
-        self.nPrice=0
         if sState=="WELCOMING":
             aReturn.append("Welcome to Wesley's pie shop")
-            aReturn.append("Would you like a SMALL, MEDIUM, or LARGE?")
-            aReturn.append("SMALL is $5, MEDIUM is $9, LARGE is $15")
+            aReturn.append("Would you like a SMALL, or LARGE?")
+            aReturn.append("SMALL is $5, LARGE is $15")
             self.data["state"]="SIZE"
         elif sState=="SIZE":
-            self.data["size"]=sInput.lower()         
+            self.data["size"]=sInput.lower() 
+            if self.data["size"]=="small":
+                self.data["price"]=5
+            elif self.data["size"]=="large":
+                self.data["price"]=15
+            else:
+                aReturn.append("Oops we only have small and large")
+                aReturn.append("Please enter small or large")  
+                return aReturn
+            aReturn.append("So far your order comes to $" + str(self.data["price"]))      
             aReturn.append("What toppings would you like?")
             aReturn.append("Please enter a list with commas")
             aReturn.append("+$2 per each topping")
             self.data["state"]="TOPPINGS"
+
         elif sState=="TOPPINGS":
             self.data["toppings"]=sInput.lower()
+            nToppings=self.data["toppings"].split(",")
+            for x in nToppings:
+                self.data["price"]+=2
+            aReturn.append("So far your order comes to $" + str(self.data["price"])) 
             aReturn.append("Would you like drinks with that?")
             aReturn.append("Please enter a list with commas or NO")
             aReturn.append("+$2 per each drink")
@@ -31,16 +44,10 @@ class Order(models.Model):
                 self.data["drinks"]=sInput.lower()
                 nDrinks=self.data["drinks"].split(",")
                 for x in nDrinks:
-                    self.nPrice+=2
-            nToppings=self.data["toppings"].split(",")
-            for x in nToppings:
-                self.nPrice+=2
-            if self.data["size"]=="small":
-                self.nPrice+=5
-            elif self.data["size"]=="medium":
-                self.nPrice+=9
-            elif self.data["size"]=="large":
-                self.nPrice+=14   
+                    self.data["price"]+=2
+
+                
+              
             
             aReturn.append("Thank you for your order")
             aReturn.append(self.data["size"]+" pie with "+self.data["toppings"])
@@ -50,7 +57,7 @@ class Order(models.Model):
             except:
                 pass
             aReturn.append("Please pick up in 20 minutes")
-            aReturn.append("The price is $"+str(self.nPrice))
+            aReturn.append("The price is $"+str(self.data["price"]))
 
             self.data["state"]="DONE"
         return aReturn
@@ -63,6 +70,8 @@ class Order(models.Model):
         return self.data["state"]
     def getSize(self):
         return self.data["size"]
+    def getPrice(self):
+        return self.data["price"]
     def getToppings(self):
         return self.data["toppings"]
     def getDrinks(self):
